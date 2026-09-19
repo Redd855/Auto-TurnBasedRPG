@@ -4,23 +4,28 @@ using UnityEngine;
 
 public class Combatant : MonoBehaviour
 {
-    [SerializeField] protected CharacterData characterData;
+    public CharacterData characterData;
 
-    protected int currentHP;
-    protected List<MoveData> currentMoves = new();
+    [SerializeField] protected int currentHP;
+
+    protected virtual void Start()
+    {
+        currentHP = characterData.maxHP;
+    }
 
     public void TakeDamage(int damage)
     {
         currentHP -= damage;
+        Debug.Log(gameObject.name + " took " + damage + " damage. HP: " + currentHP);
     }
 
-    public void Heal(int healAmount)
+    public void Heal(int amount)
     {
-        currentHP += healAmount;
-    }
+        currentHP += amount;
 
-    public MoveData GetMove(int index)
-    {
-        return currentMoves[index];
+        if (currentHP > characterData.maxHP)
+            currentHP = characterData.maxHP;
+
+        Debug.Log(gameObject.name + " healed " + amount + ". HP: " + currentHP);
     }
 }

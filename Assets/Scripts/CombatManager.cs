@@ -4,8 +4,8 @@ using UnityEngine.InputSystem;
 
 public class CombatManager : MonoBehaviour
 {
-    [SerializeField] private List<PlayerCombatant> playerParty;
-    [SerializeField] private List<EnemyCombatant> enemyParty;
+    [SerializeField] public List<PlayerCombatant> playerParty;
+    [SerializeField] public List<EnemyCombatant> enemyParty;
 
     private bool playerTurn = true;
     private int currentIndex = 0;
@@ -52,11 +52,11 @@ public class CombatManager : MonoBehaviour
             enemyParty[currentIndex].TakeTurn();
         }
     }
-    private Combatant GetCurrentCombatant()
+    public PlayerCombatant GetCurrentPlayer()
     {
         if (playerTurn)
             return playerParty[currentIndex];
 
-        return enemyParty[currentIndex];
+        return null;
     }
 }
