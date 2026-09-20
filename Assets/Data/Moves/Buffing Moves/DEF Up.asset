@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1020de8ee7417d44d9d8bfcf8fe59f2d, type: 3}
-  m_Name: Arrow Shot
+  m_Name: DEF Up
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
-  moveName: Arrow Shot
-  description: A weak ranged arrow shot
-  moveType: 0
-  moveElement: 0
-  statTarget: 3
-  power: 5
+  moveName: DEF Up
+  description: Defense Buff
+  moveType: 2
+  moveElement: 4
+  statTarget: 2
+  power: 1

@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Knight
   maxHP: 25
-  attack: 1
-  defense: 2
+  physATK: 0
+  magicATK: 0
+  defense: 0
   moves:
+  - {fileID: 11400000, guid: 4c9d43306f2694d46b2a715b69b15cb5, type: 2}
+  - {fileID: 11400000, guid: 4c9d43306f2694d46b2a715b69b15cb5, type: 2}
   - {fileID: 11400000, guid: 4c9d43306f2694d46b2a715b69b15cb5, type: 2}

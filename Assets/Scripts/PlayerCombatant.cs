@@ -59,7 +59,7 @@ public class PlayerCombatant : Combatant
 
         Debug.Log(gameObject.name + " selected " + selectedMove.moveName);
 
-        if (selectedMove.moveType == MoveData.MoveType.Attack)
+        if (selectedMove.moveType == MoveData.MoveType.Attack || selectedMove.moveType == MoveData.MoveType.Debuff)
         {
             selectingTarget = true;
             selectingAlly = false;
@@ -68,7 +68,7 @@ public class PlayerCombatant : Combatant
 
             Debug.Log("Select an enemy to attack.");
         }
-        else if (selectedMove.moveType == MoveData.MoveType.Heal)
+        else if (selectedMove.moveType == MoveData.MoveType.Heal || selectedMove.moveType == MoveData.MoveType.Buff)
         {
             selectingTarget = true;
             selectingAlly = true;
@@ -84,13 +84,22 @@ public class PlayerCombatant : Combatant
         if (!selectingTarget || !selectingAlly)
             return;
 
-        Debug.Log(gameObject.name + " healed " + ally.gameObject.name);
-
-        ally.Heal(selectedMove.power);
+        if (selectedMove.moveType == MoveData.MoveType.Buff)
+        {
+            ally.ApplyStatModifier(
+                selectedMove.statTarget,
+                selectedMove.moveType
+            );
+        }
+        else if (selectedMove.moveType == MoveData.MoveType.Heal)
+        {
+            ally.Heal(selectedMove.power);
+        }
 
         selectingTarget = false;
         selectingAlly = false;
 
+        ReduceModifierDurations();
         combatManager.NextTurn();
     }
 
@@ -99,11 +108,24 @@ public class PlayerCombatant : Combatant
         if (!selectingTarget)
             return;
 
-        Debug.Log(gameObject.name + " attacked " + enemy.gameObject.name);
+        Debug.Log(gameObject.name + " used " + selectedMove.moveName +
+                  " on " + enemy.gameObject.name);
 
-        enemy.TakeDamage(selectedMove.power);
+        if (selectedMove.moveType == MoveData.MoveType.Debuff)
+        {
+            enemy.ApplyStatModifier(
+                selectedMove.statTarget,
+                selectedMove.moveType
+            );
+        }
+        else if (selectedMove.moveType == MoveData.MoveType.Attack)
+        {
+            enemy.TakeDamage(this, selectedMove);
+        }
 
         selectingTarget = false;
+
+        ReduceModifierDurations();
         combatManager.NextTurn();
     }
 

@@ -5,6 +5,7 @@ public class EnemyCombatant : Combatant
 {
     private CombatManager combatManager;
 
+    public EnemyAI enemyAI;
     private void Awake()
     {
         combatManager = FindFirstObjectByType<CombatManager>();
@@ -33,8 +34,6 @@ public class EnemyCombatant : Combatant
 
     public void TakeTurn()
     {
-        Debug.Log("Enemy Attacked");
-
-        combatManager.NextTurn();
+        enemyAI.TakeTurn();
     }
 }

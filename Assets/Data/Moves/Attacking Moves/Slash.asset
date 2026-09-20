@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
   moveName: Slash
   description: A weak slashing hit
+  moveType: 0
+  moveElement: 0
+  statTarget: 2
   power: 5

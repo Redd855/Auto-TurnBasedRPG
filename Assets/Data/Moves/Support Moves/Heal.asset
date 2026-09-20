@@ -15,4 +15,6 @@ MonoBehaviour:
   moveName: Heal
   description: Weak healing magic
   moveType: 1
+  moveElement: 4
+  statTarget: 2
   power: 5

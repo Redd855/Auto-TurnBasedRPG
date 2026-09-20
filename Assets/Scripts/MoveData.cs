@@ -7,7 +7,25 @@ public class MoveData : ScriptableObject
     {
         Attack,
         Heal,
-        Buff
+        Buff,
+        Debuff
+    }
+
+    public enum MoveElement
+    {
+        Physical,
+        Fire,
+        Water,
+        Life,
+        None
+    }
+
+    public enum StatType
+    {
+        PhysAttack,
+        MagicAttack,
+        Defense,
+        None
     }
 
     [Header("Move Info")]
@@ -18,5 +36,9 @@ public class MoveData : ScriptableObject
 
     [Header("Combat")]
     public MoveType moveType;
+    public MoveElement moveElement;
+
+    [Header("Effect")]
+    public StatType statTarget;
     public int power;
 }

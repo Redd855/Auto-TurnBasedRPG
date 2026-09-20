@@ -15,4 +15,6 @@ MonoBehaviour:
   moveName: Fireshock
   description: A weak fire attack
   moveType: 0
+  moveElement: 0
+  statTarget: 2
   power: 5

@@ -18,3 +18,5 @@ MonoBehaviour:
   defense: 1
   moves:
   - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
+  - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
+  - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
