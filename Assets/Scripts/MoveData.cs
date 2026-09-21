@@ -57,4 +57,22 @@ public class MoveData : ScriptableObject
     [Header("Effect")]
     public StatType statTarget;
     public int power;
+
+    public enum AdditionalEffectType
+    {
+        None,
+        Status,
+        Debuff
+    }
+
+    [Header("Additional Effect")]
+    public AdditionalEffectType additionalEffect;
+
+    [Range(0f, 100f)]
+    public float effectChance;
+
+    public Combatant.StatusEffect statusEffect;
+    public int statusDuration;
+
+    public StatType debuffTarget;
 }

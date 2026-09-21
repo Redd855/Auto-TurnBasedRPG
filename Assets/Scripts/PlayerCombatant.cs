@@ -1,5 +1,6 @@
-using UnityEngine;
+using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerCombatant : Combatant
@@ -22,7 +23,6 @@ public class PlayerCombatant : Combatant
         if (!Mouse.current.leftButton.wasPressedThisFrame)
             return;
 
-        // Only the player whose turn it is can select targets.
         if (combatManager.GetCurrentPlayer() != this)
             return;
 
@@ -37,7 +37,6 @@ public class PlayerCombatant : Combatant
         if (hit == null)
             return;
 
-        // Check if we clicked an ally.
         PlayerCombatant ally = hit.GetComponent<PlayerCombatant>();
 
         if (ally != null)
@@ -46,7 +45,6 @@ public class PlayerCombatant : Combatant
             return;
         }
 
-        // Check if we clicked an enemy.
         EnemyCombatant enemy = hit.GetComponent<EnemyCombatant>();
 
         if (enemy != null)
@@ -72,11 +70,17 @@ public class PlayerCombatant : Combatant
 
     public void SelectMove(int moveIndex)
     {
-        // Make sure this character is actually taking their turn.
         if (combatManager.GetCurrentPlayer() != this)
             return;
 
-        selectedMove = characterData.moves[moveIndex];
+        if (HasStatus(StatusEffect.Confusion))
+        {
+            SelectRandomAttack();
+        }
+        else
+        {
+            selectedMove = characterData.moves[moveIndex];
+        }
 
         Debug.Log(
             gameObject.name + " selected " +
@@ -96,6 +100,39 @@ public class PlayerCombatant : Combatant
         {
             Debug.Log("Select an enemy.");
         }
+    }
+
+    private void SelectRandomAttack()
+    {
+        List<MoveData> attackingMoves = new List<MoveData>();
+
+        foreach (MoveData move in characterData.moves)
+        {
+            if (move.moveType == MoveData.MoveType.Attack)
+            {
+                attackingMoves.Add(move);
+            }
+        }
+
+        if (attackingMoves.Count == 0)
+        {
+            Debug.Log(
+                gameObject.name +
+                " is Confused, but has no attack moves!"
+            );
+
+            return;
+        }
+
+        selectedMove = attackingMoves[
+            Random.Range(0, attackingMoves.Count)
+        ];
+
+        Debug.Log(
+            gameObject.name +
+            " is Confused and randomly selected " +
+            selectedMove.moveName
+        );
     }
 
     public void SelectAlly(PlayerCombatant ally)
@@ -206,6 +243,8 @@ public class PlayerCombatant : Combatant
         selectedMove = null;
 
         ReduceModifierDurations();
+
+        ProcessEndOfTurnStatus();
 
         combatManager.NextTurn();
     }

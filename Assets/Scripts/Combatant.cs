@@ -13,6 +13,18 @@ public class Combatant : MonoBehaviour
         Debuff
     }
 
+    public enum StatusEffect
+    {
+        None,
+        Poison,
+        Stun,
+        Dizzy,
+        Confusion
+    }
+
+    protected StatusEffect currentStatus = StatusEffect.None;
+    protected int statusDuration = 0;
+
     protected StatModifier physAttackStatus = StatModifier.Normal;
     protected StatModifier magicAttackStatus = StatModifier.Normal;
     protected StatModifier defenseStatus = StatModifier.Normal;
@@ -28,8 +40,18 @@ public class Combatant : MonoBehaviour
     }
 
 
-    public void TakeDamage(Combatant attacker, MoveData move)
+    public bool TakeDamage(Combatant attacker, MoveData move)
     {
+        if (attacker.AttackMisses())
+        {
+            Debug.Log(
+                attacker.gameObject.name +
+                "'s attack missed because they are Dizzy!"
+            );
+
+            return false;
+        }
+
         float attackMultiplier;
         float defenseMultiplier;
 
@@ -62,8 +84,10 @@ public class Combatant : MonoBehaviour
         if (characterData.IsWeakTo(move.moveElement))
         {
             Debug.Log(
-                gameObject.name + " is weak to " +
-                move.moveElement + "!"
+                gameObject.name +
+                " is weak to " +
+                move.moveElement +
+                "!"
             );
 
             damage *= 2;
@@ -75,10 +99,14 @@ public class Combatant : MonoBehaviour
         currentHP -= damage;
 
         Debug.Log(
-            attacker.gameObject.name + " dealt " +
-            damage + " damage to " +
+            attacker.gameObject.name +
+            " dealt " +
+            damage +
+            " damage to " +
             gameObject.name
         );
+
+        return true;
     }
 
 
@@ -107,27 +135,52 @@ public class Combatant : MonoBehaviour
         {
             case MoveData.StatType.PhysAttack:
 
-                physAttackStatus = GetNewModifier(physAttackStatus,modifier,ref physAttackDuration);
+                physAttackStatus = GetNewModifier(
+                    physAttackStatus,
+                    modifier,
+                    ref physAttackDuration
+                );
+
                 break;
 
 
             case MoveData.StatType.MagicAttack:
 
-                magicAttackStatus = GetNewModifier(magicAttackStatus,modifier,ref magicAttackDuration);
+                magicAttackStatus = GetNewModifier(
+                    magicAttackStatus,
+                    modifier,
+                    ref magicAttackDuration
+                );
+
                 break;
 
 
             case MoveData.StatType.Defense:
 
-                defenseStatus = GetNewModifier(defenseStatus,modifier,ref defenseDuration);
+                defenseStatus = GetNewModifier(
+                    defenseStatus,
+                    modifier,
+                    ref defenseDuration
+                );
+
                 break;
         }
 
-        Debug.Log(gameObject.name + " " +stat +" is now " +modifier +" for 3 actions.");
+        Debug.Log(
+            gameObject.name +
+            " " +
+            stat +
+            " is now " +
+            modifier +
+            " for 3 actions."
+        );
     }
 
 
-    private StatModifier GetNewModifier(StatModifier currentStatus,MoveData.MoveType modifier,ref int duration)
+    private StatModifier GetNewModifier(
+        StatModifier currentStatus,
+        MoveData.MoveType modifier,
+        ref int duration)
     {
         if (modifier == MoveData.MoveType.Buff)
         {
@@ -236,6 +289,141 @@ public class Combatant : MonoBehaviour
                     "'s Defense modifier wore off."
                 );
             }
+        }
+    }
+
+
+    public void ApplyStatusEffect(StatusEffect effect, int duration)
+    {
+        if (effect == StatusEffect.None)
+            return;
+
+        currentStatus = effect;
+        statusDuration = duration;
+
+        Debug.Log(
+            gameObject.name +
+            " is now affected by " +
+            effect +
+            " for " +
+            duration +
+            " turns."
+        );
+    }
+
+
+    public bool HasStatus(StatusEffect effect)
+    {
+        return currentStatus == effect;
+    }
+
+
+    public bool IsStunned()
+    {
+        return currentStatus == StatusEffect.Stun;
+    }
+
+
+    public void ReduceStatusDuration()
+    {
+        if (currentStatus == StatusEffect.None)
+            return;
+
+        statusDuration--;
+
+        if (statusDuration <= 0)
+        {
+            Debug.Log(
+                gameObject.name +
+                "'s " +
+                currentStatus +
+                " wore off."
+            );
+
+            currentStatus = StatusEffect.None;
+            statusDuration = 0;
+        }
+    }
+
+
+    public void ProcessEndOfTurnStatus()
+    {
+        if (currentStatus == StatusEffect.None)
+            return;
+
+        // Poison damage
+        if (currentStatus == StatusEffect.Poison)
+        {
+            int damage = Mathf.RoundToInt(
+                characterData.maxHP * 0.05f
+            );
+
+            damage = Mathf.Max(damage, 1);
+
+            currentHP -= damage;
+
+            Debug.Log(
+                gameObject.name +
+                " took " +
+                damage +
+                " poison damage."
+            );
+        }
+
+        // Reduce duration
+        statusDuration--;
+
+        if (statusDuration <= 0)
+        {
+            Debug.Log(
+                gameObject.name +
+                "'s " +
+                currentStatus +
+                " wore off."
+            );
+
+            currentStatus = StatusEffect.None;
+            statusDuration = 0;
+        }
+    }
+
+
+    public bool AttackMisses()
+    {
+        if (!HasStatus(StatusEffect.Dizzy))
+            return false;
+
+        return Random.Range(0f, 100f) < 25f;
+    }
+
+
+    public void TryApplyAdditionalEffect(MoveData move)
+    {
+        if (move.additionalEffect == MoveData.AdditionalEffectType.None)
+            return;
+
+        if (Random.Range(0f, 100f) >= move.effectChance)
+            return;
+
+        switch (move.additionalEffect)
+        {
+            case MoveData.AdditionalEffectType.Status:
+
+                ApplyStatusEffect(
+                    move.statusEffect,
+                    move.statusDuration
+                );
+
+                break;
+
+            case MoveData.AdditionalEffectType.Debuff:
+
+                ApplyStatModifier(
+                    move.debuffTarget,
+                    MoveData.MoveType.Debuff
+                );
+
+                break;
         }
     }
 }

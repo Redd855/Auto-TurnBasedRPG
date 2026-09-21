@@ -6,9 +6,7 @@ public class AttackerAI : EnemyAI
 {
     public override void TakeTurn()
     {
-        List<MoveData> attackingMoves = enemy.characterData.moves
-            .Where(move => move.moveType == MoveData.MoveType.Attack)
-            .ToList();
+        List<MoveData> attackingMoves = enemy.characterData.moves.Where(move => move.moveType == MoveData.MoveType.Attack).ToList();
 
         if (attackingMoves.Count == 0)
         {
@@ -17,43 +15,54 @@ public class AttackerAI : EnemyAI
             return;
         }
 
-        MoveData selectedMove = attackingMoves[
-            Random.Range(0, attackingMoves.Count)
-        ];
+        MoveData selectedMove;
 
-        if (selectedMove.targetType == MoveData.TargetType.AllEnemies)
+        if (enemy.HasStatus(Combatant.StatusEffect.Confusion))
         {
-            AttackAllPlayers(selectedMove);
+            selectedMove = attackingMoves[Random.Range(0, attackingMoves.Count)];
+
+            Debug.Log(enemy.gameObject.name +" is Confused and randomly selected " + selectedMove.moveName);
         }
         else
         {
-            AttackOnePlayer(selectedMove);
+            selectedMove = attackingMoves[Random.Range(0, attackingMoves.Count)];
+        }
+
+        switch (selectedMove.targetType)
+        {
+            case MoveData.TargetType.SingleEnemy:
+                AttackOnePlayer(selectedMove);
+                break;
+
+            case MoveData.TargetType.AllEnemies:
+                AttackAllPlayers(selectedMove);
+                break;
+
+            default:
+                Debug.LogWarning(enemy.gameObject.name +" has an invalid attack target type: " +selectedMove.targetType);
+                break;
         }
 
         enemy.ReduceModifierDurations();
+
+        enemy.ProcessEndOfTurnStatus();
+
         combatManager.NextTurn();
     }
 
     private void AttackOnePlayer(MoveData move)
     {
-        PlayerCombatant target = combatManager.playerParty[
-            Random.Range(0, combatManager.playerParty.Count)
-        ];
+        PlayerCombatant target = combatManager.playerParty[Random.Range(0, combatManager.playerParty.Count)];
 
         target.TakeDamage(enemy, move);
 
-        Debug.Log(
-            "Enemy uses " + move.moveName +
-            " on " + target.gameObject.name
+        Debug.Log("Enemy uses " + move.moveName +" on " + target.gameObject.name
         );
     }
 
     private void AttackAllPlayers(MoveData move)
     {
-        Debug.Log(
-            "Enemy uses " + move.moveName +
-            " on all players!"
-        );
+        Debug.Log("Enemy uses " + move.moveName +" on all players!");
 
         foreach (PlayerCombatant target in combatManager.playerParty)
         {
