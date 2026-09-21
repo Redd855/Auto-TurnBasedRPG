@@ -15,6 +15,8 @@ MonoBehaviour:
   moveName: Slash
   description: A weak slashing hit
   moveType: 0
+  damageType: 1
   moveElement: 0
-  statTarget: 2
+  targetType: 3
+  statTarget: 3
   power: 5

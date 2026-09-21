@@ -52,11 +52,34 @@ public class CombatManager : MonoBehaviour
             enemyParty[currentIndex].TakeTurn();
         }
     }
+
     public PlayerCombatant GetCurrentPlayer()
     {
         if (playerTurn)
             return playerParty[currentIndex];
 
         return null;
+    }
+
+    public bool IsAlly(Combatant user, Combatant target)
+    {
+        if (user is PlayerCombatant)
+            return target is PlayerCombatant;
+
+        if (user is EnemyCombatant)
+            return target is EnemyCombatant;
+
+        return false;
+    }
+
+    public bool IsEnemy(Combatant user, Combatant target)
+    {
+        if (user is PlayerCombatant)
+            return target is EnemyCombatant;
+
+        if (user is EnemyCombatant)
+            return target is PlayerCombatant;
+
+        return false;
     }
 }

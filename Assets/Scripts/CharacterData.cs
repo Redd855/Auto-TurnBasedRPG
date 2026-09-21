@@ -15,4 +15,15 @@ public class CharacterData : ScriptableObject
 
     [Header("Moves")]
     public List<MoveData> moves;
+
+    [Header("Elemental Weaknesses")]
+    public List<MoveData.MoveElement> weaknesses;
+
+    public bool IsWeakTo(MoveData.MoveElement element)
+    {
+        if (element == MoveData.MoveElement.None)
+            return false;
+
+        return weaknesses.Contains(element);
+    }
 }

@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1020de8ee7417d44d9d8bfcf8fe59f2d, type: 3}
-  m_Name: ATK Down
+  m_Name: Physical ATK Up
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
-  moveName: ATK Down
-  description: Lower an enemy's attack
-  moveType: 3
-  moveElement: 4
+  moveName: Physical ATK Up
+  description: Physical Attack buff
+  moveType: 2
+  damageType: 0
+  moveElement: 0
   statTarget: 0
-  power: -1
+  power: 1

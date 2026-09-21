@@ -14,9 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Mage
   maxHP: 15
-  attack: 2
+  physATK: 0
+  magicATK: 0
   defense: 1
   moves:
   - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
+  - {fileID: 11400000, guid: bb8d28ec5f8d0e54686032f73c5eed35, type: 2}
   - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
-  - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
+  weaknesses: 

@@ -11,13 +11,27 @@ public class MoveData : ScriptableObject
         Debuff
     }
 
+    public enum DamageType
+    {
+        None,
+        Physical,
+        Magic
+    }
+
     public enum MoveElement
     {
-        Physical,
+        None,
         Fire,
         Water,
-        Life,
-        None
+        Life
+    }
+
+    public enum TargetType
+    {
+        SingleAlly,
+        AllAllies,
+        SingleEnemy,
+        AllEnemies
     }
 
     public enum StatType
@@ -36,7 +50,9 @@ public class MoveData : ScriptableObject
 
     [Header("Combat")]
     public MoveType moveType;
+    public DamageType damageType;
     public MoveElement moveElement;
+    public TargetType targetType;
 
     [Header("Effect")]
     public StatType statTarget;

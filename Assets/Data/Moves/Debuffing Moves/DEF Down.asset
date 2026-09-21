@@ -15,6 +15,7 @@ MonoBehaviour:
   moveName: DEF Down
   description: Lower an enemy's defense
   moveType: 3
-  moveElement: 4
+  damageType: 0
+  moveElement: 0
   statTarget: 2
   power: -1

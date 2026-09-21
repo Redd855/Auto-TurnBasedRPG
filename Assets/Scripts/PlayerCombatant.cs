@@ -11,7 +11,6 @@ public class PlayerCombatant : Combatant
 
     private MoveData selectedMove;
     private bool selectingTarget = false;
-    private bool selectingAlly = false;
 
     private void Awake()
     {
@@ -20,28 +19,46 @@ public class PlayerCombatant : Combatant
 
     private void Update()
     {
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (!Mouse.current.leftButton.wasPressedThisFrame)
+            return;
+
+        // Only the player whose turn it is can select targets.
+        if (combatManager.GetCurrentPlayer() != this)
+            return;
+
+        if (!selectingTarget)
+            return;
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector2 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+
+        Collider2D hit = Physics2D.OverlapPoint(worldPosition);
+
+        if (hit == null)
+            return;
+
+        // Check if we clicked an ally.
+        PlayerCombatant ally = hit.GetComponent<PlayerCombatant>();
+
+        if (ally != null)
         {
-            Vector2 mousePosition = Mouse.current.position.ReadValue();
-            Vector2 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            SelectAlly(ally);
+            return;
+        }
 
-            Collider2D hit = Physics2D.OverlapPoint(worldPosition);
+        // Check if we clicked an enemy.
+        EnemyCombatant enemy = hit.GetComponent<EnemyCombatant>();
 
-            if (hit != null && hit.gameObject == gameObject)
-            {
-                PlayerCombatant currentPlayer = combatManager.GetCurrentPlayer();
-
-                if (currentPlayer != null)
-                {
-                    currentPlayer.SelectAlly(this);
-                }
-            }
+        if (enemy != null)
+        {
+            SelectEnemy(enemy);
         }
     }
 
     public void ShowMoves()
     {
         characterMenu.SetActive(true);
+
         for (int i = 0; i < moveTexts.Length; i++)
         {
             moveTexts[i].text = characterData.moves[i].moveName;
@@ -55,52 +72,63 @@ public class PlayerCombatant : Combatant
 
     public void SelectMove(int moveIndex)
     {
+        // Make sure this character is actually taking their turn.
+        if (combatManager.GetCurrentPlayer() != this)
+            return;
+
         selectedMove = characterData.moves[moveIndex];
 
-        Debug.Log(gameObject.name + " selected " + selectedMove.moveName);
+        Debug.Log(
+            gameObject.name + " selected " +
+            selectedMove.moveName
+        );
 
-        if (selectedMove.moveType == MoveData.MoveType.Attack || selectedMove.moveType == MoveData.MoveType.Debuff)
+        selectingTarget = true;
+
+        HideMoves();
+
+        if (selectedMove.targetType == MoveData.TargetType.SingleAlly ||
+            selectedMove.targetType == MoveData.TargetType.AllAllies)
         {
-            selectingTarget = true;
-            selectingAlly = false;
-
-            HideMoves();
-
-            Debug.Log("Select an enemy to attack.");
+            Debug.Log("Select an ally.");
         }
-        else if (selectedMove.moveType == MoveData.MoveType.Heal || selectedMove.moveType == MoveData.MoveType.Buff)
+        else
         {
-            selectingTarget = true;
-            selectingAlly = true;
-
-            HideMoves();
-
-            Debug.Log("Select an ally to heal.");
+            Debug.Log("Select an enemy.");
         }
     }
 
     public void SelectAlly(PlayerCombatant ally)
     {
-        if (!selectingTarget || !selectingAlly)
+        if (!selectingTarget)
             return;
 
-        if (selectedMove.moveType == MoveData.MoveType.Buff)
+        if (selectedMove.targetType != MoveData.TargetType.SingleAlly &&
+            selectedMove.targetType != MoveData.TargetType.AllAllies)
+            return;
+
+        if (!combatManager.IsAlly(this, ally))
+            return;
+
+        Debug.Log(
+            gameObject.name + " used " +
+            selectedMove.moveName + " on " +
+            ally.gameObject.name
+        );
+
+        if (selectedMove.targetType == MoveData.TargetType.SingleAlly)
         {
-            ally.ApplyStatModifier(
-                selectedMove.statTarget,
-                selectedMove.moveType
-            );
+            ApplyMove(ally);
         }
-        else if (selectedMove.moveType == MoveData.MoveType.Heal)
+        else if (selectedMove.targetType == MoveData.TargetType.AllAllies)
         {
-            ally.Heal(selectedMove.power);
+            foreach (PlayerCombatant player in combatManager.playerParty)
+            {
+                ApplyMove(player);
+            }
         }
 
-        selectingTarget = false;
-        selectingAlly = false;
-
-        ReduceModifierDurations();
-        combatManager.NextTurn();
+        FinishMove();
     }
 
     public void SelectEnemy(EnemyCombatant enemy)
@@ -108,29 +136,86 @@ public class PlayerCombatant : Combatant
         if (!selectingTarget)
             return;
 
-        Debug.Log(gameObject.name + " used " + selectedMove.moveName +
-                  " on " + enemy.gameObject.name);
+        if (selectedMove.targetType != MoveData.TargetType.SingleEnemy &&
+            selectedMove.targetType != MoveData.TargetType.AllEnemies)
+            return;
 
-        if (selectedMove.moveType == MoveData.MoveType.Debuff)
+        if (!combatManager.IsEnemy(this, enemy))
+            return;
+
+        Debug.Log(
+            gameObject.name + " used " +
+            selectedMove.moveName + " on " +
+            enemy.gameObject.name
+        );
+
+        if (selectedMove.targetType == MoveData.TargetType.SingleEnemy)
         {
-            enemy.ApplyStatModifier(
-                selectedMove.statTarget,
-                selectedMove.moveType
-            );
+            ApplyMove(enemy);
         }
-        else if (selectedMove.moveType == MoveData.MoveType.Attack)
+        else if (selectedMove.targetType == MoveData.TargetType.AllEnemies)
         {
-            enemy.TakeDamage(this, selectedMove);
+            foreach (EnemyCombatant target in combatManager.enemyParty)
+            {
+                ApplyMove(target);
+            }
         }
 
+        FinishMove();
+    }
+
+    private void ApplyMove(Combatant target)
+    {
+        switch (selectedMove.moveType)
+        {
+            case MoveData.MoveType.Attack:
+
+                target.TakeDamage(this, selectedMove);
+
+                break;
+
+            case MoveData.MoveType.Heal:
+
+                target.Heal(selectedMove.power);
+
+                break;
+
+            case MoveData.MoveType.Buff:
+
+                target.ApplyStatModifier(
+                    selectedMove.statTarget,
+                    selectedMove.moveType
+                );
+
+                break;
+
+            case MoveData.MoveType.Debuff:
+
+                target.ApplyStatModifier(
+                    selectedMove.statTarget,
+                    selectedMove.moveType
+                );
+
+                break;
+        }
+    }
+
+    private void FinishMove()
+    {
         selectingTarget = false;
+        selectedMove = null;
 
         ReduceModifierDurations();
+
         combatManager.NextTurn();
     }
 
     public bool IsTargetingEnemy()
     {
-        return selectingTarget && !selectingAlly;
+        if (!selectingTarget || selectedMove == null)
+            return false;
+
+        return selectedMove.targetType == MoveData.TargetType.SingleEnemy ||
+               selectedMove.targetType == MoveData.TargetType.AllEnemies;
     }
 }

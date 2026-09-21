@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1020de8ee7417d44d9d8bfcf8fe59f2d, type: 3}
-  m_Name: DEF Up
+  m_Name: Magic ATK Up
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
-  moveName: DEF Up
-  description: Defense Buff
+  moveName: Magic ATK Up
+  description: Magic Attack buff
   moveType: 2
   damageType: 0
   moveElement: 0
-  statTarget: 2
+  statTarget: 1
   power: 1

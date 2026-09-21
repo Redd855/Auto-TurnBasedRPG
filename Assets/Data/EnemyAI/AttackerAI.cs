@@ -21,16 +21,43 @@ public class AttackerAI : EnemyAI
             Random.Range(0, attackingMoves.Count)
         ];
 
+        if (selectedMove.targetType == MoveData.TargetType.AllEnemies)
+        {
+            AttackAllPlayers(selectedMove);
+        }
+        else
+        {
+            AttackOnePlayer(selectedMove);
+        }
+
+        enemy.ReduceModifierDurations();
+        combatManager.NextTurn();
+    }
+
+    private void AttackOnePlayer(MoveData move)
+    {
         PlayerCombatant target = combatManager.playerParty[
             Random.Range(0, combatManager.playerParty.Count)
         ];
 
-        target.TakeDamage(enemy, selectedMove);
+        target.TakeDamage(enemy, move);
 
-        Debug.Log("Enemy uses " + selectedMove.moveName +
-                  " on " + target.gameObject.name);
+        Debug.Log(
+            "Enemy uses " + move.moveName +
+            " on " + target.gameObject.name
+        );
+    }
 
-        enemy.ReduceModifierDurations();
-        combatManager.NextTurn();
+    private void AttackAllPlayers(MoveData move)
+    {
+        Debug.Log(
+            "Enemy uses " + move.moveName +
+            " on all players!"
+        );
+
+        foreach (PlayerCombatant target in combatManager.playerParty)
+        {
+            target.TakeDamage(enemy, move);
+        }
     }
 }

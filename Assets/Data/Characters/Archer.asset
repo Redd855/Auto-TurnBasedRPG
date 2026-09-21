@@ -19,5 +19,6 @@ MonoBehaviour:
   defense: 0
   moves:
   - {fileID: 11400000, guid: a37f9561e3a0d0c41bba8169d30c8ef2, type: 2}
-  - {fileID: 11400000, guid: 530061acc6f9618419e49761af383c65, type: 2}
+  - {fileID: 11400000, guid: 62aeec0c656916e4ea46a8eb43c7e1b8, type: 2}
   - {fileID: 11400000, guid: 3b15367b9c0acfc43b0e4859766a2b3e, type: 2}
+  weaknesses: 
