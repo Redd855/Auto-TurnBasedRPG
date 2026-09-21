@@ -44,6 +44,7 @@ public class MoveData : ScriptableObject
 
     [Header("Move Info")]
     public string moveName;
+    public int MPCost;
 
     [TextArea]
     public string description;
@@ -53,6 +54,13 @@ public class MoveData : ScriptableObject
     public DamageType damageType;
     public MoveElement moveElement;
     public TargetType targetType;
+
+    [Header("Accuracy & Critical")]
+    [Range(0f, 100f)]
+    public float missChance;
+
+    [Range(0f, 100f)]
+    public float critChance;
 
     [Header("Effect")]
     public StatType statTarget;

@@ -9,6 +9,7 @@ public class CharacterData : ScriptableObject
 
     [Header("Stats")]
     public int maxHP;
+    public int maxMP;
     public int physATK;
     public int magicATK;
     public int defense;

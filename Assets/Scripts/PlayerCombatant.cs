@@ -9,17 +9,28 @@ public class PlayerCombatant : Combatant
     public CombatManager combatManager;
 
     [SerializeField] private TMP_Text[] moveTexts;
+    [SerializeField] protected int currentMP;
+    [SerializeField] private MoveData basicAttack;
 
     private MoveData selectedMove;
     private bool selectingTarget = false;
 
+
+
     private void Awake()
     {
         combatManager = FindFirstObjectByType<CombatManager>();
+        currentMP = characterData.maxMP;
     }
 
     private void Update()
     {
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            SelectBasicAttack();
+            return;
+        }
+
         if (!Mouse.current.leftButton.wasPressedThisFrame)
             return;
 
@@ -82,6 +93,22 @@ public class PlayerCombatant : Combatant
             selectedMove = characterData.moves[moveIndex];
         }
 
+        if (selectedMove == null)
+            return;
+
+        if (currentMP < selectedMove.MPCost)
+        {
+            Debug.Log(
+                gameObject.name + " does not have enough MP for " +
+                selectedMove.moveName
+            );
+
+            selectedMove = null;
+            ShowMoves();
+
+            return;
+        }
+
         Debug.Log(
             gameObject.name + " selected " +
             selectedMove.moveName
@@ -100,6 +127,7 @@ public class PlayerCombatant : Combatant
         {
             Debug.Log("Select an enemy.");
         }
+
     }
 
     private void SelectRandomAttack()
@@ -239,11 +267,12 @@ public class PlayerCombatant : Combatant
 
     private void FinishMove()
     {
+        currentMP -= selectedMove.MPCost;
+
         selectingTarget = false;
         selectedMove = null;
 
         ReduceModifierDurations();
-
         ProcessEndOfTurnStatus();
 
         combatManager.NextTurn();
@@ -256,5 +285,38 @@ public class PlayerCombatant : Combatant
 
         return selectedMove.targetType == MoveData.TargetType.SingleEnemy ||
                selectedMove.targetType == MoveData.TargetType.AllEnemies;
+    }
+
+    public void SelectBasicAttack()
+    {
+        if (combatManager.GetCurrentPlayer() != this)
+            return;
+
+        selectedMove = basicAttack;
+
+        if (selectedMove == null)
+        {
+            Debug.LogWarning(gameObject.name + " has no basic attack assigned!");
+            return;
+        }
+
+        Debug.Log(
+            gameObject.name + " selected " +
+            selectedMove.moveName
+        );
+
+        selectingTarget = true;
+
+        HideMoves();
+
+        if (selectedMove.targetType == MoveData.TargetType.SingleAlly ||
+            selectedMove.targetType == MoveData.TargetType.AllAllies)
+        {
+            Debug.Log("Select an ally.");
+        }
+        else
+        {
+            Debug.Log("Select an enemy.");
+        }
     }
 }

@@ -42,11 +42,13 @@ public class Combatant : MonoBehaviour
 
     public bool TakeDamage(Combatant attacker, MoveData move)
     {
-        if (attacker.AttackMisses())
+        if (attacker.AttackMisses(move))
         {
             Debug.Log(
                 attacker.gameObject.name +
-                "'s attack missed because they are Dizzy!"
+                "'s " +
+                move.moveName +
+                " missed!"
             );
 
             return false;
@@ -80,6 +82,20 @@ public class Combatant : MonoBehaviour
         int damage = Mathf.RoundToInt(
             baseDamage * attackMultiplier / defenseMultiplier
         );
+
+        bool criticalHit = Random.Range(0f, 100f) < move.critChance;
+
+        if (criticalHit)
+        {
+            damage *= 2;
+
+            Debug.Log(
+                attacker.gameObject.name +
+                "'s " +
+                move.moveName +
+                " was a CRITICAL HIT!"
+            );
+        }
 
         if (characterData.IsWeakTo(move.moveElement))
         {
@@ -388,12 +404,19 @@ public class Combatant : MonoBehaviour
     }
 
 
-    public bool AttackMisses()
+    public bool AttackMisses(MoveData move)
     {
-        if (!HasStatus(StatusEffect.Dizzy))
-            return false;
 
-        return Random.Range(0f, 100f) < 25f;
+        if (Random.Range(0f, 100f) < move.missChance)
+            return true;
+
+        if (HasStatus(StatusEffect.Dizzy))
+        {
+            if (Random.Range(0f, 100f) < 25f)
+                return true;
+        }
+
+        return false;
     }
 
 
