@@ -45,11 +45,39 @@ public class CombatManager : MonoBehaviour
 
         if (playerTurn)
         {
-            playerParty[currentIndex].ShowMoves();
+            PlayerCombatant player = playerParty[currentIndex];
+
+            if (player.IsStunned())
+            {
+                Debug.Log(
+                    player.gameObject.name +
+                    " is stunned and skips their turn!"
+                );
+
+                player.ReduceStatusDuration();
+                NextTurn();
+                return;
+            }
+
+            player.ShowMoves();
         }
         else
         {
-            enemyParty[currentIndex].TakeTurn();
+            EnemyCombatant enemy = enemyParty[currentIndex];
+
+            if (enemy.IsStunned())
+            {
+                Debug.Log(
+                    enemy.gameObject.name +
+                    " is stunned and skips their turn!"
+                );
+
+                enemy.ReduceStatusDuration();
+                NextTurn();
+                return;
+            }
+
+            enemy.TakeTurn();
         }
     }
 

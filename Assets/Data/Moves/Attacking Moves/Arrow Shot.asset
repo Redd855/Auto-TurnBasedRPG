@@ -20,3 +20,8 @@ MonoBehaviour:
   targetType: 2
   statTarget: 3
   power: 5
+  additionalEffect: 2
+  effectChance: 0
+  statusEffect: 0
+  statusDuration: 0
+  debuffTarget: 0
