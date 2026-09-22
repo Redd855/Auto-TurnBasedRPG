@@ -13,6 +13,11 @@ public class EnemyCombatant : Combatant
 
     private void Update()
     {
+        if (IsDefeated())
+        {
+            return;
+        }
+
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             Vector2 mousePosition = Mouse.current.position.ReadValue();

@@ -30,6 +30,9 @@ public class CharacterData : ScriptableObject
     [Header("Rewards")]
     public int experienceReward;
 
+    [Header("Passive")]
+    public PassiveData passive;
+
     public bool IsWeakTo(MoveData.MoveElement element)
     {
         if (element == MoveData.MoveElement.None)

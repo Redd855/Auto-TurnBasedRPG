@@ -174,6 +174,8 @@
 
         public void SelectAlly(PlayerCombatant ally)
         {
+
+
             if (!selectingTarget)
                 return;
 
@@ -184,7 +186,10 @@
             if (!combatManager.IsAlly(this, ally))
                 return;
 
-            Debug.Log(
+            if (ally.IsDefeated() && selectedMove.moveType != MoveData.MoveType.Heal)
+                return;
+
+        Debug.Log(
                 gameObject.name + " used " +
                 selectedMove.moveName + " on " +
                 ally.gameObject.name
@@ -207,6 +212,10 @@
 
         public void SelectEnemy(EnemyCombatant enemy)
         {
+            if (enemy.IsDefeated())
+            {
+                return;
+            }
             if (!selectingTarget)
                 return;
 
@@ -231,6 +240,9 @@
             {
                 foreach (EnemyCombatant target in combatManager.enemyParty)
                 {
+                    if (target.IsDefeated())
+                        continue;
+
                     ApplyMove(target);
                 }
             }
@@ -274,20 +286,18 @@
             }
         }
 
-        private void FinishMove()
-        {
-            currentMP -= selectedMove.MPCost;
+    private void FinishMove()
+    {
+        currentMP -= selectedMove.MPCost;
 
-            selectingTarget = false;
-            selectedMove = null;
+        selectingTarget = false;
+        selectedMove = null;
 
-            ReduceModifierDurations();
-            ProcessEndOfTurnStatus();
+        OnTurnEnd();
+        combatManager.NextTurn();
+    }
 
-            combatManager.NextTurn();
-        }
-
-        public bool IsTargetingEnemy()
+    public bool IsTargetingEnemy()
         {
             if (!selectingTarget || selectedMove == null)
                 return false;

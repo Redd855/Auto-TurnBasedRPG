@@ -39,7 +39,88 @@ public class Combatant : MonoBehaviour
         currentHP = characterData.maxHP;
     }
 
+    public void OnBattleStart()
+    {
+        if (characterData.passive == null)
+            return;
 
+        characterData.passive.OnBattleStart(this);
+    }
+
+    public bool OnTurnStart()
+    {
+        if (!ProcessStartOfTurnStatus())
+            return false;
+
+        if (characterData.passive != null)
+            characterData.passive.OnTurnStart(this);
+
+        return true;
+    }
+
+    public bool ProcessStartOfTurnStatus()
+    {
+        if (currentStatus == StatusEffect.None)
+            return true;
+
+        switch (currentStatus)
+        {
+            case StatusEffect.Stun:
+
+                Debug.Log(
+                    gameObject.name +
+                    " is stunned and skips their turn!"
+                );
+
+                ReduceStatusDuration();
+
+                return false;
+        }
+
+        return true;
+    }
+
+    public void OnTurnEnd()
+    {
+        ReduceModifierDurations();
+        ProcessEndOfTurnStatus();
+        ReduceStatusDuration();
+
+        if (characterData.passive != null)
+            characterData.passive.OnTurnEnd(this);
+    }
+
+    public int ModifyIncomingDamage(
+        Combatant attacker,
+        MoveData move,
+        int damage)
+    {
+        if (characterData.passive == null)
+            return damage;
+
+        return characterData.passive.ModifyIncomingDamage(
+            this,
+            attacker,
+            move,
+            damage
+        );
+    }
+
+    public int ModifyOutgoingDamage(
+        Combatant target,
+        MoveData move,
+        int damage)
+    {
+        if (characterData.passive == null)
+            return damage;
+
+        return characterData.passive.ModifyOutgoingDamage(
+            this,
+            target,
+            move,
+            damage
+        );
+    }
     public bool TakeDamage(Combatant attacker, MoveData move)
     {
         if (attacker.AttackMisses(move))
@@ -59,31 +140,45 @@ public class Combatant : MonoBehaviour
 
         if (move.damageType == MoveData.DamageType.Physical)
         {
-            attackMultiplier = GetMultiplier(attacker.physAttackStatus);
+            attackMultiplier = GetMultiplier(
+                attacker.physAttackStatus
+            );
         }
         else
         {
-            attackMultiplier = GetMultiplier(attacker.magicAttackStatus);
+            attackMultiplier = GetMultiplier(
+                attacker.magicAttackStatus
+            );
         }
 
-        defenseMultiplier = GetMultiplier(defenseStatus);
+        defenseMultiplier = GetMultiplier(
+            defenseStatus
+        );
 
         int baseDamage;
 
         if (move.damageType == MoveData.DamageType.Physical)
         {
-            baseDamage = attacker.characterData.physATK + move.power;
+            baseDamage =
+                attacker.characterData.physATK +
+                move.power;
         }
         else
         {
-            baseDamage = attacker.characterData.magicATK + move.power;
+            baseDamage =
+                attacker.characterData.magicATK +
+                move.power;
         }
 
         int damage = Mathf.RoundToInt(
-            baseDamage * attackMultiplier / defenseMultiplier
+            baseDamage *
+            attackMultiplier /
+            defenseMultiplier
         );
 
-        bool criticalHit = Random.Range(0f, 100f) < move.critChance;
+        // Critical hit
+        bool criticalHit =
+            Random.Range(0f, 100f) < move.critChance;
 
         if (criticalHit)
         {
@@ -97,6 +192,7 @@ public class Combatant : MonoBehaviour
             );
         }
 
+        // Elemental weakness
         if (characterData.IsWeakTo(move.moveElement))
         {
             Debug.Log(
@@ -109,10 +205,27 @@ public class Combatant : MonoBehaviour
             damage *= 2;
         }
 
+        // Attacker passive
+        damage = attacker.ModifyOutgoingDamage(
+            this,
+            move,
+            damage
+        );
+
+        // Defender passive
+        damage = ModifyIncomingDamage(
+            attacker,
+            move,
+            damage
+        );
+
+        // Prevent damage from going below 1
         if (damage < 1)
             damage = 1;
 
         currentHP -= damage;
+
+        CheckForDefeat();
 
         Debug.Log(
             attacker.gameObject.name +
@@ -121,9 +234,15 @@ public class Combatant : MonoBehaviour
             " damage to " +
             gameObject.name
         );
+        
+        if (!isDefeated)
+        {
+            TryApplyAdditionalEffect(move);
+        }
 
         return true;
     }
+
 
 
     public void Heal(int amount)
@@ -367,39 +486,28 @@ public class Combatant : MonoBehaviour
         if (currentStatus == StatusEffect.None)
             return;
 
-        // Poison damage
-        if (currentStatus == StatusEffect.Poison)
+        switch (currentStatus)
         {
-            int damage = Mathf.RoundToInt(
-                characterData.maxHP * 0.05f
-            );
+            case StatusEffect.Poison:
 
-            damage = Mathf.Max(damage, 1);
+                int damage = Mathf.RoundToInt(
+                    characterData.maxHP * 0.05f
+                );
 
-            currentHP -= damage;
+                damage = Mathf.Max(damage, 1);
 
-            Debug.Log(
-                gameObject.name +
-                " took " +
-                damage +
-                " poison damage."
-            );
-        }
+                currentHP -= damage;
 
-        // Reduce duration
-        statusDuration--;
+                Debug.Log(
+                    gameObject.name +
+                    " took " +
+                    damage +
+                    " poison damage."
+                );
 
-        if (statusDuration <= 0)
-        {
-            Debug.Log(
-                gameObject.name +
-                "'s " +
-                currentStatus +
-                " wore off."
-            );
+                break;
 
-            currentStatus = StatusEffect.None;
-            statusDuration = 0;
+                // Future statuses can go here.
         }
     }
 
@@ -448,5 +556,24 @@ public class Combatant : MonoBehaviour
 
                 break;
         }
+    }
+
+    public bool isDefeated = false;
+
+    public bool IsDefeated()
+    {
+        return isDefeated;
+    }
+
+    protected void CheckForDefeat()
+    {
+        if(currentHP > 0)
+        {
+            return;
+        }
+
+        currentHP = 0;
+        isDefeated = true;
+        Debug.Log(gameObject.name + " has been defeated!");
     }
 }

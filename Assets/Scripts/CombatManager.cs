@@ -18,6 +18,7 @@ public class CombatManager : MonoBehaviour
 
         if (playerParty.Count > 0)
         {
+            playerParty[0].OnTurnStart();
             playerParty[0].ShowMoves();
         }
     }
@@ -46,6 +47,7 @@ public class CombatManager : MonoBehaviour
             );
 
             combatant.Initialize(player);
+            combatant.OnBattleStart();
 
             playerParty.Add(combatant);
         }
@@ -73,16 +75,22 @@ public class CombatManager : MonoBehaviour
 
         if (playerTurn)
         {
+            while(currentIndex < playerParty.Count && playerParty[currentIndex].IsDefeated())
+            {
+                currentIndex++;
+            }
+
+            if (currentIndex >= playerParty.Count)
+            {
+                Defeat();
+                return;
+            }
+
             PlayerCombatant player = playerParty[currentIndex];
 
-            if (player.IsStunned())
+            if (!player.OnTurnStart())
             {
-                Debug.Log(
-                    player.gameObject.name +
-                    " is stunned and skips their turn!"
-                );
-
-                player.ReduceStatusDuration();
+                player.OnTurnEnd();
                 NextTurn();
                 return;
             }
@@ -91,16 +99,21 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
+            while (currentIndex < enemyParty.Count && enemyParty[currentIndex].IsDefeated())
+            {
+                currentIndex++;
+            }
+
+            if (currentIndex >= enemyParty.Count)
+            {
+                Victory();
+                return;
+            }
             EnemyCombatant enemy = enemyParty[currentIndex];
 
-            if (enemy.IsStunned())
+            if (!enemy.OnTurnStart())
             {
-                Debug.Log(
-                    enemy.gameObject.name +
-                    " is stunned and skips their turn!"
-                );
-
-                enemy.ReduceStatusDuration();
+                enemy.OnTurnEnd();
                 NextTurn();
                 return;
             }
@@ -137,5 +150,27 @@ public class CombatManager : MonoBehaviour
             return target is PlayerCombatant;
 
         return false;
+    }
+
+    private void Victory()
+    {
+        int totalEXP = 0;
+
+        foreach (EnemyCombatant enemy in enemyParty)
+        {
+            totalEXP += enemy.characterData.experienceReward;
+        }
+
+        foreach (PlayerCharacter player in GameManager.Instance.currentBattleParty)
+        {
+            player.experience += totalEXP;
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Overworld");
+    }
+
+    private void Defeat()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Overworld");
     }
 }

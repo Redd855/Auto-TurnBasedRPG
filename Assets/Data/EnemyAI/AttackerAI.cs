@@ -43,10 +43,7 @@ public class AttackerAI : EnemyAI
                 break;
         }
 
-        enemy.ReduceModifierDurations();
-
-        enemy.ProcessEndOfTurnStatus();
-
+        enemy.OnTurnEnd();
         combatManager.NextTurn();
     }
 
