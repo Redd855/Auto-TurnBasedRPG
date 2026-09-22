@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Archer
   maxHP: 10
+  maxMP: 0
   physATK: 0
   magicATK: 0
   defense: 0
-  moves:
-  - {fileID: 11400000, guid: a37f9561e3a0d0c41bba8169d30c8ef2, type: 2}
-  - {fileID: 11400000, guid: 62aeec0c656916e4ea46a8eb43c7e1b8, type: 2}
-  - {fileID: 11400000, guid: 3b15367b9c0acfc43b0e4859766a2b3e, type: 2}
+  basicAttack: {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
+  playerCombatPrefab: {fileID: 9450092959476647, guid: 23c6cc7b8c0bfa84f852ea52e0a94f09, type: 3}
+  enemyCombatPrefab: {fileID: 0}
+  defaultMoves:
+  - {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
+  - {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
+  - {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
   weaknesses: 

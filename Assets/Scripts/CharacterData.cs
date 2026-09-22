@@ -14,11 +14,21 @@ public class CharacterData : ScriptableObject
     public int magicATK;
     public int defense;
 
+    [Header("Basic Attack")]
+    public MoveData basicAttack;
+
+    [Header("Combat Prefabs")]
+    public PlayerCombatant playerCombatPrefab;
+    public EnemyCombatant enemyCombatPrefab;
+
     [Header("Moves")]
-    public List<MoveData> moves;
+    public List<MoveData> defaultMoves;
 
     [Header("Elemental Weaknesses")]
     public List<MoveData.MoveElement> weaknesses;
+
+    [Header("Rewards")]
+    public int experienceReward;
 
     public bool IsWeakTo(MoveData.MoveElement element)
     {

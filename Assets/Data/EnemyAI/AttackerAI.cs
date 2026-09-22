@@ -6,7 +6,7 @@ public class AttackerAI : EnemyAI
 {
     public override void TakeTurn()
     {
-        List<MoveData> attackingMoves = enemy.characterData.moves.Where(move => move.moveType == MoveData.MoveType.Attack).ToList();
+        List<MoveData> attackingMoves = enemy.characterData.defaultMoves.Where(move => move.moveType == MoveData.MoveType.Attack).ToList();
 
         if (attackingMoves.Count == 0)
         {

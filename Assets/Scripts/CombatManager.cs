@@ -1,25 +1,53 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CombatManager : MonoBehaviour
 {
-    [SerializeField] public List<PlayerCombatant> playerParty;
-    [SerializeField] public List<EnemyCombatant> enemyParty;
+    public List<PlayerCombatant> playerParty = new();
+    public List<EnemyCombatant> enemyParty = new();
+
+    [SerializeField] private Transform[] playerSpawnPoints;
+    [SerializeField] private Transform[] enemySpawnPoints;
 
     private bool playerTurn = true;
     private int currentIndex = 0;
 
     private void Start()
     {
-        playerParty[0].ShowMoves();
+        SpawnPlayers();
+
+        if (playerParty.Count > 0)
+        {
+            playerParty[0].ShowMoves();
+        }
     }
 
-    private void Update()
+    private void SpawnPlayers()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        List<PlayerCharacter> party = GameManager.Instance.currentBattleParty;
+
+        for (int i = 0; i < party.Count; i++)
         {
-            NextTurn();
+            if (i >= playerSpawnPoints.Length)
+            {
+                Debug.LogWarning(
+                    "Not enough player spawn points for the current battle party."
+                );
+
+                break;
+            }
+
+            PlayerCharacter player = party[i];
+
+            PlayerCombatant combatant = Instantiate(
+                player.characterData.playerCombatPrefab,
+                playerSpawnPoints[i].position,
+                Quaternion.identity
+            );
+
+            combatant.Initialize(player);
+
+            playerParty.Add(combatant);
         }
     }
 
