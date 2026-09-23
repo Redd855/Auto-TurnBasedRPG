@@ -7,14 +7,28 @@ public class TestPartySetup : MonoBehaviour
     [SerializeField] private CharacterData mageData;
     [SerializeField] private CharacterData clericData;
 
+    private GameManager gameManager;
+
     private void Start()
     {
-        CreateTestParty();
+        gameManager = GameManager.Instance;
+
+        if (gameManager == null)
+        {
+            Debug.LogError("GameManager.Instance is NULL!");
+            return;
+        }
+
+        if (gameManager.currentBattleParty == null ||
+            gameManager.currentBattleParty.Count == 0)
+        {
+            CreateTestParty();
+        }
     }
 
     private void CreateTestParty()
     {
-        GameManager gameManager = GameManager.Instance;
+
 
         gameManager.party.Clear();
 

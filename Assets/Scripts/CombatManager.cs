@@ -54,81 +54,136 @@ public class CombatManager : MonoBehaviour
     }
 
     public void NextTurn()
-    {
-        if (playerTurn)
         {
-            playerParty[currentIndex].HideMoves();
-        }
+            // Check if all enemies are defeated
+            bool allEnemiesDefeated = true;
 
-        currentIndex++;
-
-        if (playerTurn && currentIndex >= playerParty.Count)
-        {
-            playerTurn = false;
-            currentIndex = 0;
-        }
-        else if (!playerTurn && currentIndex >= enemyParty.Count)
-        {
-            playerTurn = true;
-            currentIndex = 0;
-        }
-
-        if (playerTurn)
-        {
-            while(currentIndex < playerParty.Count && playerParty[currentIndex].IsDefeated())
+            foreach (EnemyCombatant enemy in enemyParty)
             {
-                currentIndex++;
+                if (!enemy.IsDefeated())
+                {
+                    allEnemiesDefeated = false;
+                    break;
+                }
             }
 
-            if (currentIndex >= playerParty.Count)
+            if (allEnemiesDefeated)
+            {
+                Victory();
+                return;
+            }
+
+            // Check if all players are defeated
+            bool allPlayersDefeated = true;
+
+            foreach (PlayerCombatant player in playerParty)
+            {
+                if (!player.IsDefeated())
+                {
+                    allPlayersDefeated = false;
+                    break;
+                }
+            }
+
+            if (allPlayersDefeated)
             {
                 Defeat();
                 return;
             }
 
-            PlayerCombatant player = playerParty[currentIndex];
-
-            if (!player.OnTurnStart())
+            if (playerTurn)
             {
-                player.OnTurnEnd();
-                NextTurn();
-                return;
-            }
+                playerParty[currentIndex].HideMoves();
 
-            player.ShowMoves();
-        }
-        else
-        {
-            while (currentIndex < enemyParty.Count && enemyParty[currentIndex].IsDefeated())
+                currentIndex++;
+
+                // Finished all player slots, switch to enemies
+                if (currentIndex >= playerParty.Count)
+                {
+                    playerTurn = false;
+                    currentIndex = 0;
+                }
+            }
+            else
             {
                 currentIndex++;
+
+                // Finished all enemy slots, switch to players
+                if (currentIndex >= enemyParty.Count)
+                {
+                    playerTurn = true;
+                    currentIndex = 0;
+                }
             }
 
-            if (currentIndex >= enemyParty.Count)
+            if (playerTurn)
             {
-                Victory();
-                return;
-            }
-            EnemyCombatant enemy = enemyParty[currentIndex];
+                // Skip defeated players
+                while (currentIndex < playerParty.Count &&
+                       playerParty[currentIndex].IsDefeated())
+                {
+                    currentIndex++;
+                }
 
-            if (!enemy.OnTurnStart())
+                // All remaining players were defeated
+                if (currentIndex >= playerParty.Count)
+                {
+                    Defeat();
+                    return;
+                }
+
+                PlayerCombatant player = playerParty[currentIndex];
+
+                if (!player.OnTurnStart())
+                {
+                    player.OnTurnEnd();
+                    NextTurn();
+                    return;
+                }
+
+                player.ShowMoves();
+            }
+            else
             {
-                enemy.OnTurnEnd();
-                NextTurn();
-                return;
-            }
+                // Skip defeated enemies
+                while (currentIndex < enemyParty.Count &&
+                       enemyParty[currentIndex].IsDefeated())
+                {
+                    currentIndex++;
+                }
 
-            enemy.TakeTurn();
-        }
+                // All remaining enemies were defeated
+                if (currentIndex >= enemyParty.Count)
+                {
+                    Victory();
+                    return;
+                }
+
+                EnemyCombatant enemy = enemyParty[currentIndex];
+
+                if (!enemy.OnTurnStart())
+                {
+                    enemy.OnTurnEnd();
+                    NextTurn();
+                    return;
+                }
+
+                enemy.TakeTurn();
+            }
     }
+
 
     public PlayerCombatant GetCurrentPlayer()
-    {
-        if (playerTurn)
-            return playerParty[currentIndex];
+        {
+            if (!playerTurn)
+                return null;
 
-        return null;
-    }
+            if (currentIndex < 0 || currentIndex >= playerParty.Count)
+                return null;
+
+            return playerParty[currentIndex];
+        }
+
 
     public bool IsAlly(Combatant user, Combatant target)
     {

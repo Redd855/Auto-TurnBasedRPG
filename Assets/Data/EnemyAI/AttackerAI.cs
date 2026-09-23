@@ -47,23 +47,54 @@ public class AttackerAI : EnemyAI
         combatManager.NextTurn();
     }
 
+
     private void AttackOnePlayer(MoveData move)
-    {
-        PlayerCombatant target = combatManager.playerParty[Random.Range(0, combatManager.playerParty.Count)];
+        {
+            List<PlayerCombatant> livingPlayers = new List<PlayerCombatant>();
 
-        target.TakeDamage(enemy, move);
+            foreach (PlayerCombatant player in combatManager.playerParty)
+            {
+                if (!player.IsDefeated())
+                {
+                    livingPlayers.Add(player);
+                }
+            }
 
-        Debug.Log("Enemy uses " + move.moveName +" on " + target.gameObject.name
-        );
+            if (livingPlayers.Count == 0)
+                return;
+
+            PlayerCombatant target = livingPlayers[
+                Random.Range(0, livingPlayers.Count)
+            ];
+
+            target.TakeDamage(enemy, move);
+
+            Debug.Log(
+                "Enemy uses " +
+                move.moveName +
+                " on " +
+                target.gameObject.name
+            );
     }
+
+
 
     private void AttackAllPlayers(MoveData move)
-    {
-        Debug.Log("Enemy uses " + move.moveName +" on all players!");
-
-        foreach (PlayerCombatant target in combatManager.playerParty)
         {
-            target.TakeDamage(enemy, move);
+            Debug.Log(
+                "Enemy uses " +
+                move.moveName +
+                " on all players!"
+            );
+
+            foreach (PlayerCombatant target in combatManager.playerParty)
+            {
+                if (target.IsDefeated())
+                    continue;
+
+                target.TakeDamage(enemy, move);
+            }
         }
-    }
+
+
 }

@@ -13,16 +13,18 @@ MonoBehaviour:
   m_Name: Mage
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Mage
-  maxHP: 15
+  maxHP: 1
   maxMP: 0
   physATK: 0
   magicATK: 0
   defense: 0
-  basicAttack: {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
+  basicAttack: {fileID: 11400000, guid: aa71651df968ae14c87ebd46212b395f, type: 2}
   playerCombatPrefab: {fileID: 1301849277322971137, guid: bd18bcbc122f96d4c83fedf992725d69, type: 3}
   enemyCombatPrefab: {fileID: 0}
   defaultMoves:
-  - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
-  - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
+  - {fileID: 11400000, guid: f730f4f817a49bc45badc5b76df2039f, type: 2}
+  - {fileID: 11400000, guid: 334baf2137afe474a9dead3382ab612e, type: 2}
   - {fileID: 11400000, guid: bdf026709fb4f0b4a9e4ac6825651cb3, type: 2}
   weaknesses: 
+  experienceReward: 0
+  passive: {fileID: 0}

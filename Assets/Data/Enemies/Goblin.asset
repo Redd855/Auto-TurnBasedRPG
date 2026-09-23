@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Goblin
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Goblin
-  maxHP: 30
+  maxHP: 10
   maxMP: 0
   physATK: 0
   magicATK: 0
@@ -27,3 +27,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6eb22d7849afcb0439d9ebadfddadace, type: 2}
   weaknesses: 01000000
   experienceReward: 50
+  passive: {fileID: 0}

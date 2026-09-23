@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1020de8ee7417d44d9d8bfcf8fe59f2d, type: 3}
-  m_Name: Arrow Shot
+  m_Name: MP Attack
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
-  moveName: Arrow Shot
-  MPCost: 0
-  description: A weak ranged arrow shot
+  moveName: Basic Attack
+  MPCost: 10
+  description: Guaranteed Crit
   moveType: 0
   damageType: 1
   moveElement: 0
@@ -22,9 +22,9 @@ MonoBehaviour:
   missChance: 0
   critChance: 0
   statTarget: 3
-  power: 5
+  power: 1
   additionalEffect: 0
   effectChance: 0
   statusEffect: 0
   statusDuration: 0
-  debuffTarget: 0
+  debuffTarget: 3
