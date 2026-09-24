@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterData
   characterName: Knight
   maxHP: 1
-  maxMP: 0
+  maxMP: 17
   physATK: 0
   magicATK: 0
   defense: 0
@@ -22,7 +22,7 @@ MonoBehaviour:
   playerCombatPrefab: {fileID: 7591970231364374084, guid: 44ea2d9fcfbd4914faace4aa1f4017d5, type: 3}
   enemyCombatPrefab: {fileID: 0}
   defaultMoves:
-  - {fileID: 11400000, guid: 530061acc6f9618419e49761af383c65, type: 2}
+  - {fileID: 11400000, guid: 301c58afca75c984c946e6800faa1d26, type: 2}
   - {fileID: 11400000, guid: 1aa4c90791fb55043af5f7d46466bc6f, type: 2}
   - {fileID: 11400000, guid: 05254a890664e1d4fadf9cc5985b754a, type: 2}
   weaknesses: 

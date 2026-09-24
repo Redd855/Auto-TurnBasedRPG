@@ -22,7 +22,7 @@ MonoBehaviour:
   playerCombatPrefab: {fileID: 9450092959476647, guid: 23c6cc7b8c0bfa84f852ea52e0a94f09, type: 3}
   enemyCombatPrefab: {fileID: 0}
   defaultMoves:
-  - {fileID: 11400000, guid: 5726b68b60cf7414a91bf70c88c8462a, type: 2}
+  - {fileID: 11400000, guid: 301c58afca75c984c946e6800faa1d26, type: 2}
   - {fileID: 11400000, guid: 334baf2137afe474a9dead3382ab612e, type: 2}
   - {fileID: 11400000, guid: bc26a362ed3a8e945bb0fd55c969cf5f, type: 2}
   weaknesses: 

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1020de8ee7417d44d9d8bfcf8fe59f2d, type: 3}
   m_Name: MP Attack
   m_EditorClassIdentifier: Assembly-CSharp::MoveData
-  moveName: Basic Attack
+  moveName: MP Attack
   MPCost: 10
   description: Guaranteed Crit
   moveType: 0
